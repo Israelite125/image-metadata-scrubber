@@ -10,9 +10,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Secure Pure CSS Animated Background Layout Engine
+# 2. Secure Pure CSS Animated Background Layout Engine (Hardened Layering)
 st.markdown("""
-   <style>
+    <style>
     /* Hardened transparent layer override across all Streamlit layout wrappers */
     html, body, 
     [data-testid="stAppViewContainer"], 
@@ -32,10 +32,10 @@ st.markdown("""
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         z-index: -9999;
-        background-color: #020617;
+        background-color: #020617 !important;
         background-image: 
             linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+            linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px) !important;
         background-size: 40px 40px;
         background-position: center;
         animation: networkShift 20s linear infinite;
@@ -53,15 +53,16 @@ st.markdown("""
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         z-index: -9998;
-        background: radial-gradient(circle at 50% -20%, rgba(129, 140, 248, 0.15) 0%, transparent 60%);
+        background: radial-gradient(circle at 50% -20%, rgba(129, 140, 248, 0.15) 0%, transparent 60%) !important;
         pointer-events: none;
     }
 
     /* Frosted glass cards for metrics and panels */
-    div.stAlert, div[data-testid="stMetricValue"] {
+    div.stAlert, div[data-testid="stMetricValue"], [data-testid="stMetric"] {
         background-color: rgba(15, 23, 42, 0.75) !important;
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px) !important;
         border-radius: 12px;
+        padding: 15px !important;
     }
     
     div.stAlert {
@@ -70,8 +71,8 @@ st.markdown("""
     
     .stTable {
         background-color: rgba(15, 23, 42, 0.8) !important;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(56, 189, 248, 0.15);
+        backdrop-filter: blur(8px) !important;
+        border: 1px solid rgba(56, 189, 248, 0.15) !important;
         border-radius: 8px;
     }
     
@@ -94,7 +95,6 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
-
 # 3. Application Interface Header
 st.title("🛡️ ExifShield Pro")
 st.write("Enterprise-grade structural asset forensic audit and metadata sanitization engine.")
