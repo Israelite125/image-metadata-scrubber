@@ -10,16 +10,26 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Advanced CSS Layout Engine
+# 2. Live Video Background & Premium CSS Layout Engine
 st.markdown("""
     <style>
-    /* Base theme setting with responsive asset background overlay */
+    /* Create a fixed background video frame behind all layers */
+    #video-background {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        z-index: -100;
+        object-fit: cover;
+        opacity: 0.15; /* Keeps the movement subtle so text remains highly readable */
+    }
+
+    /* Base theme setting with deep canvas backing */
     [data-testid="stAppViewContainer"] {
-        background: linear-gradient(rgba(15, 23, 42, 0.88), rgba(2, 6, 23, 0.95)), 
-                    url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1920&auto=format&fit=crop');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        background-color: #030712;
         background-attachment: fixed;
     }
     
@@ -61,6 +71,10 @@ st.markdown("""
         margin-bottom: 15px;
     }
     </style>
+    
+    <video autoplay loop muted playsinline id="video-background">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-and-numbers-31948-large.mp4" type="video/mp4">
+    </video>
     """, unsafe_allow_html=True)
 
 # 3. Application Interface Header
@@ -68,7 +82,7 @@ st.title("🛡️ ExifShield Pro")
 st.write("Enterprise-grade structural asset forensic audit and metadata sanitization engine.")
 st.markdown("---")
 
-# FEATURE 1: Real-Time Security Metrics Row (High Supervisor Appeal)
+# FEATURE 1: Real-Time Security Metrics Row
 m1, m2, m3 = st.columns(3)
 with m1:
     st.metric(label="Global Assets Sanitized", value="14,281", delta="+312 this week")
