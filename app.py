@@ -10,55 +10,66 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Hardened Live Video Background HTML & CSS
+# 2. Secure Pure CSS Animated Background (No External Video Links)
 st.markdown("""
     <style>
-    /* Absolute base selectors to force transparency over the video layer */
+    /* Base configuration forcing transparency over our custom background */
     html, body, [data-testid="stAppViewContainer"], .main, [data-testid="stHeader"] {
-        background-color: transparent !important;
         background: transparent !important;
+        background-color: transparent !important;
         color: #f8fafc;
     }
     
-    /* Fixed background container for the video element */
-    #video-background {
+    /* Creating a dynamic cyber-grid background using pure CSS gradients */
+    body::before {
+        content: "";
         position: fixed;
-        right: 0;
-        bottom: 0;
-        min-width: 100%;
-        min-height: 100%;
-        width: auto;
-        height: auto;
-        z-index: -9999; /* Sends it to the absolute bottom layer */
-        object-fit: cover;
-        opacity: 0.18; /* Subtle cyber animation opacity */
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: -9999;
+        background-color: #020617;
+        background-image: 
+            linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+        background-size: 40px 40px;
+        background-position: center;
+        animation: networkShift 20s linear infinite;
+    }
+    
+    /* Smooth background movement animation */
+    @keyframes networkShift {
+        0% { background-position: 0 0; }
+        100% { background-position: 40px 40px; }
+    }
+    
+    /* Top glowing color gradient to break the flat look */
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: -9998;
+        background: radial-gradient(circle at 50% -20%, rgba(129, 140, 248, 0.15) 0%, transparent 60%);
         pointer-events: none;
     }
-    
-    /* Content wrapper tuning to prevent overlapping layout limits */
-    [data-testid="stAppViewBlockContainer"] {
-        background-color: transparent !important;
-    }
-    
-    /* Frosted glass styling for metrics and info containers */
+
+    /* Frosted glass cards for metrics and panels */
     div.stAlert, div[data-testid="stMetricValue"] {
-        background-color: rgba(15, 23, 42, 0.65) !important;
+        background-color: rgba(15, 23, 42, 0.75) !important;
         backdrop-filter: blur(12px);
         border-radius: 12px;
     }
     
     div.stAlert {
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+        border: 1px solid rgba(56, 189, 248, 0.25) !important;
     }
     
     .stTable {
         background-color: rgba(15, 23, 42, 0.8) !important;
         backdrop-filter: blur(8px);
-        border: 1px solid rgba(56, 189, 248, 0.2);
+        border: 1px solid rgba(56, 189, 248, 0.15);
         border-radius: 8px;
     }
     
-    /* Title text styling */
+    /* Header styling */
     h1 {
         font-family: 'Inter', sans-serif;
         font-weight: 800 !important;
@@ -76,10 +87,6 @@ st.markdown("""
         margin-bottom: 15px;
     }
     </style>
-    
-    <video autoplay loop muted playsinline id="video-background">
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-and-numbers-31948-large.mp4" type="video/mp4">
-    </video>
     """, unsafe_allow_html=True)
 
 # 3. Application Interface Header
@@ -110,3 +117,11 @@ st.sidebar.caption("🤖 Node_Akure: Stripped GPS Telemetry from asset_4402.jpg"
 
 # 5. Core Operational File Pipeline
 uploaded_file = st.file_uploader("Upload Image Target Asset for Forensic Mapping", type=["jpg", "jpeg"])
+
+if uploaded_file is not None:
+    file_bytes = uploaded_file.getvalue()
+    file_size_mb = len(file_bytes) / (1024 * 1024)
+    
+    if file_size_mb > max_size_mb:
+        st.error(f"🛑 Security Violation: File size exceeds boundaries ({file_size_mb:.2f}MB).")
+    else:
