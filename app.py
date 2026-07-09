@@ -12,9 +12,15 @@ st.set_page_config(
 
 # 2. Secure Pure CSS Animated Background Layout Engine
 st.markdown("""
-    <style>
-    /* Base configuration forcing transparency over our custom background */
-    html, body, [data-testid="stAppViewContainer"], .main, [data-testid="stHeader"] {
+   <style>
+    /* Hardened transparent layer override across all Streamlit layout wrappers */
+    html, body, 
+    [data-testid="stAppViewContainer"], 
+    [data-testid="stAppViewBlockContainer"],
+    [data-testid="stHeader"], 
+    .main, 
+    .block-container,
+    [data-testid="stCanvas"] {
         background: transparent !important;
         background-color: transparent !important;
         color: #f8fafc;
