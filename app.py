@@ -3,100 +3,134 @@ from PIL import Image
 import piexif
 import io
 
-# 1. Page Configuration (Professional Branding)
+# 1. Page Configuration
 st.set_page_config(
-    page_title="ExifShield Pro | Advanced Metadata Sanitizer", 
+    page_title="ExifShield Pro", 
     page_icon="🛡️", 
     layout="wide"
 )
 
-st.title("🛡️ ExifShield Pro: Enterprise Privacy & Forensic Audit Tool")
+# 2. Advanced CSS Injector (Changes background to deep tech gradient and styles cards)
+st.markdown("""
+    <style>
+    /* Gradient Background for the entire app */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+        color: #f8fafc;
+    }
+    
+    /* Custom Styling for Streamlit Metric/Info boxes */
+    div.stAlert {
+        background-color: rgba(30, 41, 59, 0.7);
+        border: 1px solid #38bdf8;
+        border-radius: 10px;
+        color: #e2e8f0;
+    }
+    
+    /* Custom styling for data tables */
+    .stTable {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 8px;
+    }
+    
+    /* Title typography styling */
+    h1 {
+        font-family: 'Inter', sans-serif;
+        font-weight: 800 !important;
+        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Glowing card headers */
+    .section-header {
+        color: #38bdf8;
+        font-weight: 600;
+        border-left: 4px solid #818cf8;
+        padding-left: 10px;
+        margin-bottom: 15px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# 3. Main Header Interface
+st.title("🛡️ ExifShield Pro")
+st.write("Enterprise-grade structural asset forensic audit and metadata sanitization engine.")
 st.markdown("---")
 
-# Layout Split: Sidebar for controls, main area for dashboard
-st.sidebar.header("⚙️ Security Parameters")
-max_size_mb = st.sidebar.slider("Maximum File Size Allowed (MB)", 1, 10, 5)
+# Sidebar configurations
+st.sidebar.markdown("<h3 style='color: #818cf8;'>Security Rules</h3>", unsafe_allow_html=True)
+max_size_mb = st.sidebar.slider("Asset Cap (MB)", 1, 10, 5)
 
-uploaded_file = st.file_uploader("Upload Image Asset for Forensic Analysis", type=["jpg", "jpeg"])
+# Layout Setup
+uploaded_file = st.file_uploader("Upload Image Target Asset", type=["jpg", "jpeg"])
 
 if uploaded_file is not None:
-    # --- SECURITY GUARDRAIL 1: File Size Validation ---
     file_bytes = uploaded_file.getvalue()
     file_size_mb = len(file_bytes) / (1024 * 1024)
     
     if file_size_mb > max_size_mb:
-        st.error(f"🛑 Security Violation: File size ({file_size_mb:.2f}MB) exceeds the configured limit of {max_size_mb}MB.")
+        st.error(f"🛑 Security Violation: File size exceeds boundaries ({file_size_mb:.2f}MB).")
     else:
-        # --- SECURITY GUARDRAIL 2: Magic Byte Verification (Hex Analysis) ---
-        # True JPEGs start with the hex bytes: FF D8 FF
         is_valid_jpeg = file_bytes.startswith(b'\xff\xd8\xff')
         
         if not is_valid_jpeg:
-            st.error("🛑 Security Alert: Malicious file signature detected! The file header does not match genuine JPEG structure.")
+            st.error("🛑 Signature Mismatch: Malicious payload header suspected.")
         else:
-            st.success("✅ File Integrity Verified: Genuine JPEG image asset structure detected.")
+            st.success("✅ File Structure Verified. Running analytics mapping...")
             
-            # Create two columns for the Dashboard Layout
             col1, col2 = st.columns([1, 1])
             
             with col1:
-                st.subheader("🖼️ Source Image Analytics")
+                st.markdown("<p class='section-header'>🖼️ Visual Asset Preview</p>", unsafe_allow_html=True)
                 original_img = Image.open(uploaded_file)
                 st.image(original_img, use_container_width=True)
                 
             with col2:
-                st.subheader("🕵️‍♂️ Forensic Metadata Audit")
+                st.markdown("<p class='section-header'>🕵️‍♂️ Forensic Register</p>", unsafe_allow_html=True)
                 
                 try:
-                    # Load EXIF data wrapper
                     exif_data = original_img.info.get('exif', b'')
                     if not exif_data:
-                        st.info("ℹ️ Minimal or no metadata wrapper detected on this asset.")
+                        st.info("No structural metadata packets discovered.")
                     else:
                         exif_dict = piexif.load(exif_data)
-                        
-                        # Parse information cleanly into tables
                         audit_log = {}
                         
                         if "0th" in exif_dict:
-                            audit_log["Camera Manufacturer"] = exif_dict["0th"].get(piexif.ImageIFD.Make, b"Hidden/None").decode('utf-8', errors='ignore')
-                            audit_log["Camera Model"] = exif_dict["0th"].get(piexif.ImageIFD.Model, b"Hidden/None").decode('utf-8', errors='ignore')
-                            audit_log["Software Used"] = exif_dict["0th"].get(piexif.ImageIFD.Software, b"Hidden/None").decode('utf-8', errors='ignore')
+                            audit_log["Device Manufacturer"] = exif_dict["0th"].get(piexif.ImageIFD.Make, b"N/A").decode('utf-8', errors='ignore')
+                            audit_log["Hardware Target"] = exif_dict["0th"].get(piexif.ImageIFD.Model, b"N/A").decode('utf-8', errors='ignore')
+                            audit_log["Software Engine"] = exif_dict["0th"].get(piexif.ImageIFD.Software, b"N/A").decode('utf-8', errors='ignore')
                         
                         if "GPS" in exif_dict and len(exif_dict["GPS"]) > 0:
-                            st.warning("🚨 CRITICAL PRIVACY LEAK: Precise GPS Telemetry Found!")
-                            audit_log["GPS Status"] = "⚠️ Location Leaking"
+                            st.warning("🚨 VULNERABILITY ALERT: GPS Telemetry Found in Asset Header!")
+                            audit_log["GPS Footprint"] = "⚠️ Active Geolocation Coordinates Leak"
                         else:
-                            audit_log["GPS Status"] = "🔒 Safe (No Telemetry)"
+                            audit_log["GPS Footprint"] = "🔒 Protected (No Coordinates)"
                             
-                        # Display data as a clean structured key-value table
                         st.table(audit_log)
                         
                 except Exception as e:
-                    st.error(f"Error executing forensic scan: {e}")
+                    st.error(f"Analysis Fault: {e}")
                 
                 st.markdown("---")
-                st.subheader("🛡️ Sanitization Pipeline")
+                st.markdown("<p class='section-header'>⚔️ Remediation Execution</p>", unsafe_allow_html=True)
                 
-                # Asynchronous memory buffer simulation for scalability
-                if st.button("Execute Zero-Trust Sanitization", type="primary"):
-                    with st.spinner("Processing asset via memory buffer pipeline..."):
-                        
-                        # Strip metadata by re-mapping raw pixel arrays
+                if st.button("Execute Zero-Trust Purge", type="primary"):
+                    with st.spinner("Scrubbing bitstream layers..."):
                         pixel_data = list(original_img.getdata())
                         clean_img = Image.new(original_img.mode, original_img.size)
                         clean_img.putdata(pixel_data)
                         
-                        # Output stream to buffer (Memory-based, horizontal scale-friendly)
                         buffer = io.BytesIO()
                         clean_img.save(buffer, format="JPEG")
                         byte_im = buffer.getvalue()
                         
-                        st.balloons()
-                        st.success("🔒 Mitigation Complete: All EXIF headers and structural metadata arrays dropped successfully.")
-                        
+                        st.success("🔒 Remediation Successful! All EXIF data dropped.")
                         st.download_button(
-                            label="📥 Download Sanitized Asset",
+                            label="📥 Download Secure Asset",
                             data=byte_im,
                             file_name="sanitized_asset.jpg",
                             mime="image/jpeg"
