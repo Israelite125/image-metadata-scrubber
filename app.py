@@ -125,4 +125,70 @@ if uploaded_file is not None:
     if file_size_mb > max_size_mb:
         st.error(f"🛑 Security Violation: File size exceeds boundaries ({file_size_mb:.2f}MB).")
     else:
-        is_valid_jpeg = file_bytes.startswith(b'\xff
+        is_valid_jpeg = file_bytes.startswith(b'\xff\xd8\xff')
+        
+        if not is_valid_jpeg:
+            st.error("🛑 Signature Mismatch: Malicious structural file modification suspected.")
+        else:
+            st.success("✅ File Structure Verified. Running forensic matrix analysis...")
+            
+            # Split interface into clear functional layout blocks
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                st.markdown("<p class='section-header'>🖼️ Visual Asset Preview</p>", unsafe_allow_html=True)
+                original_img = Image.open(uploaded_file)
+                st.image(original_img, use_container_width=True)
+                
+            with col2:
+                st.markdown("<p class='section-header'>🕵️‍♂️ Forensic Register & Assessment</p>", unsafe_allow_html=True)
+                
+                try:
+                    exif_data = original_img.info.get('exif', b'')
+                    if not exif_data:
+                        st.info("No hidden metadata wrappers discovered.")
+                        st.progress(0.0, text="Threat Severity: LOW RISK (No Leaks)")
+                    else:
+                        exif_dict = piexif.load(exif_data)
+                        audit_log = {}
+                        
+                        if "0th" in exif_dict:
+                            audit_log["Device Manufacturer"] = exif_dict["0th"].get(piexif.ImageIFD.Make, b"N/A").decode('utf-8', errors='ignore')
+                            audit_log["Hardware Target"] = exif_dict["0th"].get(piexif.ImageIFD.Model, b"N/A").decode('utf-8', errors='ignore')
+                            audit_log["Software Engine"] = exif_dict["0th"].get(piexif.ImageIFD.Software, b"N/A").decode('utf-8', errors='ignore')
+                        
+                        # FEATURE 3: Dynamic Severity Assessment Progress Bars
+                        if "GPS" in exif_dict and len(exif_dict["GPS"]) > 0:
+                            st.error("🚨 CRITICAL METADATA LEAK DETECTED")
+                            st.progress(0.95, text="Threat Severity: CRITICAL RISK (GPS Telemetry Exposed)")
+                            audit_log["GPS Footprint"] = "⚠️ Active Geolocation Coordinates Leak"
+                        else:
+                            st.warning("⚠️ MEDIUM PRIVACY EXPOSURE")
+                            st.progress(0.45, text="Threat Severity: MEDIUM RISK (Device Fingerprint Exposed)")
+                            audit_log["GPS Footprint"] = "🔒 Protected (No Coordinates)"
+                            
+                        st.table(audit_log)
+                        
+                except Exception as e:
+                    st.error(f"Analysis Fault: {e}")
+                
+                st.markdown("---")
+                st.markdown("<p class='section-header'>⚔️ Remediation Execution</p>", unsafe_allow_html=True)
+                
+                if st.button("Execute Zero-Trust Purge", type="primary"):
+                    with st.spinner("Scrubbing bitstream layers..."):
+                        pixel_data = list(original_img.getdata())
+                        clean_img = Image.new(original_img.mode, original_img.size)
+                        clean_img.putdata(pixel_data)
+                        
+                        buffer = io.BytesIO()
+                        clean_img.save(buffer, format="JPEG")
+                        byte_im = buffer.getvalue()
+                        
+                        st.success("🔒 Remediation Successful! All EXIF telemetry dropped.")
+                        st.download_button(
+                            label="📥 Download Secure Asset",
+                            data=byte_im,
+                            file_name="sanitized_asset.jpg",
+                            mime="image/jpeg"
+                        )
