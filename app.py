@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Secure Pure CSS Animated Background (No External Video Links)
+# 2. Secure Pure CSS Animated Background Layout Engine
 st.markdown("""
     <style>
     /* Base configuration forcing transparency over our custom background */
@@ -125,3 +125,32 @@ if uploaded_file is not None:
     if file_size_mb > max_size_mb:
         st.error(f"🛑 Security Violation: File size exceeds boundaries ({file_size_mb:.2f}MB).")
     else:
+        is_valid_jpeg = file_bytes.startswith(b'\xff\xd8\xff')
+        
+        if not is_valid_jpeg:
+            st.error("🛑 Signature Mismatch: Malicious structural file modification suspected.")
+        else:
+            st.success("✅ File Structure Verified. Running forensic matrix analysis...")
+            
+            # Split interface into clear functional layout blocks
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                st.markdown("<p class='section-header'>🖼️ Visual Asset Preview</p>", unsafe_allow_html=True)
+                original_img = Image.open(uploaded_file)
+                st.image(original_img, use_container_width=True)
+                
+            with col2:
+                st.markdown("<p class='section-header'>🕵️‍♂️ Forensic Register & Assessment</p>", unsafe_allow_html=True)
+                
+                try:
+                    exif_data = original_img.info.get('exif', b'')
+                    if not exif_data:
+                        st.info("No hidden metadata wrappers discovered.")
+                        st.progress(0.0, text="Threat Severity: LOW RISK (No Leaks)")
+                    else:
+                        exif_dict = piexif.load(exif_data)
+                        audit_log = {}
+                        
+                        if "0th" in exif_dict:
+                            audit_log["Device Manufacturer"] = exif_dict["0th"].get(piexif.ImageIFD.Make, b"N
