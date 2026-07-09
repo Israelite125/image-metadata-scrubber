@@ -10,10 +10,17 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Live Video Background & Premium CSS Layout Engine
+# 2. Hardened Live Video Background HTML & CSS
 st.markdown("""
     <style>
-    /* Create a fixed background video frame behind all layers */
+    /* Absolute base selectors to force transparency over the video layer */
+    html, body, [data-testid="stAppViewContainer"], .main, [data-testid="stHeader"] {
+        background-color: transparent !important;
+        background: transparent !important;
+        color: #f8fafc;
+    }
+    
+    /* Fixed background container for the video element */
     #video-background {
         position: fixed;
         right: 0;
@@ -22,38 +29,36 @@ st.markdown("""
         min-height: 100%;
         width: auto;
         height: auto;
-        z-index: -100;
+        z-index: -9999; /* Sends it to the absolute bottom layer */
         object-fit: cover;
-        opacity: 0.15; /* Keeps the movement subtle so text remains highly readable */
-    }
-
-    /* Base theme setting with deep canvas backing */
-    [data-testid="stAppViewContainer"] {
-        background-color: #030712;
-        background-attachment: fixed;
+        opacity: 0.18; /* Subtle cyber animation opacity */
+        pointer-events: none;
     }
     
-    [data-testid="stHeader"], [data-testid="stAppViewBlockContainer"] {
+    /* Content wrapper tuning to prevent overlapping layout limits */
+    [data-testid="stAppViewBlockContainer"] {
         background-color: transparent !important;
-        color: #f8fafc;
     }
     
-    /* Frosted glass styling for containers */
-    div.stAlert {
-        background-color: rgba(15, 23, 42, 0.75) !important;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    /* Frosted glass styling for metrics and info containers */
+    div.stAlert, div[data-testid="stMetricValue"] {
+        background-color: rgba(15, 23, 42, 0.65) !important;
+        backdrop-filter: blur(12px);
         border-radius: 12px;
+    }
+    
+    div.stAlert {
+        border: 1px solid rgba(56, 189, 248, 0.3) !important;
     }
     
     .stTable {
         background-color: rgba(15, 23, 42, 0.8) !important;
-        backdrop-filter: blur(6px);
+        backdrop-filter: blur(8px);
         border: 1px solid rgba(56, 189, 248, 0.2);
         border-radius: 8px;
     }
     
-    /* Dynamic gradient typography */
+    /* Title text styling */
     h1 {
         font-family: 'Inter', sans-serif;
         font-weight: 800 !important;
@@ -105,78 +110,3 @@ st.sidebar.caption("🤖 Node_Akure: Stripped GPS Telemetry from asset_4402.jpg"
 
 # 5. Core Operational File Pipeline
 uploaded_file = st.file_uploader("Upload Image Target Asset for Forensic Mapping", type=["jpg", "jpeg"])
-
-if uploaded_file is not None:
-    file_bytes = uploaded_file.getvalue()
-    file_size_mb = len(file_bytes) / (1024 * 1024)
-    
-    if file_size_mb > max_size_mb:
-        st.error(f"🛑 Security Violation: File size exceeds boundaries ({file_size_mb:.2f}MB).")
-    else:
-        is_valid_jpeg = file_bytes.startswith(b'\xff\xd8\xff')
-        
-        if not is_valid_jpeg:
-            st.error("🛑 Signature Mismatch: Malicious structural file modification suspected.")
-        else:
-            st.success("✅ File Structure Verified. Running forensic matrix analysis...")
-            
-            # Split interface into clear functional layout blocks
-            col1, col2 = st.columns([1, 1])
-            
-            with col1:
-                st.markdown("<p class='section-header'>🖼️ Visual Asset Preview</p>", unsafe_allow_html=True)
-                original_img = Image.open(uploaded_file)
-                st.image(original_img, use_container_width=True)
-                
-            with col2:
-                st.markdown("<p class='section-header'>🕵️‍♂️ Forensic Register & Assessment</p>", unsafe_allow_html=True)
-                
-                try:
-                    exif_data = original_img.info.get('exif', b'')
-                    if not exif_data:
-                        st.info("No hidden metadata wrappers discovered.")
-                        st.progress(0.0, text="Threat Severity: LOW RISK (No Leaks)")
-                    else:
-                        exif_dict = piexif.load(exif_data)
-                        audit_log = {}
-                        
-                        if "0th" in exif_dict:
-                            audit_log["Device Manufacturer"] = exif_dict["0th"].get(piexif.ImageIFD.Make, b"N/A").decode('utf-8', errors='ignore')
-                            audit_log["Hardware Target"] = exif_dict["0th"].get(piexif.ImageIFD.Model, b"N/A").decode('utf-8', errors='ignore')
-                            audit_log["Software Engine"] = exif_dict["0th"].get(piexif.ImageIFD.Software, b"N/A").decode('utf-8', errors='ignore')
-                        
-                        # FEATURE 3: Dynamic Severity Assessment Progress Bars
-                        if "GPS" in exif_dict and len(exif_dict["GPS"]) > 0:
-                            st.error("🚨 CRITICAL METADATA LEAK DETECTED")
-                            st.progress(0.95, text="Threat Severity: CRITICAL RISK (GPS Telemetry Exposed)")
-                            audit_log["GPS Footprint"] = "⚠️ Active Geolocation Coordinates Leak"
-                        else:
-                            st.warning("⚠️ MEDIUM PRIVACY EXPOSURE")
-                            st.progress(0.45, text="Threat Severity: MEDIUM RISK (Device Fingerprint Exposed)")
-                            audit_log["GPS Footprint"] = "🔒 Protected (No Coordinates)"
-                            
-                        st.table(audit_log)
-                        
-                except Exception as e:
-                    st.error(f"Analysis Fault: {e}")
-                
-                st.markdown("---")
-                st.markdown("<p class='section-header'>⚔️ Remediation Execution</p>", unsafe_allow_html=True)
-                
-                if st.button("Execute Zero-Trust Purge", type="primary"):
-                    with st.spinner("Scrubbing bitstream layers..."):
-                        pixel_data = list(original_img.getdata())
-                        clean_img = Image.new(original_img.mode, original_img.size)
-                        clean_img.putdata(pixel_data)
-                        
-                        buffer = io.BytesIO()
-                        clean_img.save(buffer, format="JPEG")
-                        byte_im = buffer.getvalue()
-                        
-                        st.success("🔒 Remediation Successful! All EXIF telemetry dropped.")
-                        st.download_button(
-                            label="📥 Download Secure Asset",
-                            data=byte_im,
-                            file_name="sanitized_asset.jpg",
-                            mime="image/jpeg"
-                        )
